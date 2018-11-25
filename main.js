@@ -4,31 +4,36 @@ var t = 0;
 var touchStart;
 var touchX = null;
 var debug = "";
-var step = 40;
+var step = Math.PI*2/12;
 
 var touchOffset;
+var touchPrev;
 
 var w = window.innerWidth;
 var h = window.innerHeight;
-for (var i=0; i<w/2; i++) {
-  //lineAt(w/2+i, h/2);
-  //lineAt(w/2-i, h/2);
-  i += step*2;
+var full = true;
+for (var i=0; i<Math.PI*2;) {
+  var a = i - Math.PI/2;
+  lineAt(w/2+Math.cos(a)*90, h/2+Math.sin(a)*90, full);
+  i += step;
+  full = !full;
 }
 
-function lineAt(x,y) {
+function lineAt(x,y,full) {
   var e = document.createElement("dev");
   e.className = "line";
   e.style.left = x+"px";
   e.style.top = y+"px";
+  e.style.transform = full ? "scale(3)" : "";
   document.body.appendChild(e);
 }
 
 var ballEl = document.getElementById("ball");
+var debugEl = document.getElementById("debug");
 var handleEl = document.getElementsByClassName("ball_handle")[0];
 
 var ball = {
-  pos: {x:w/2,y:0},
+  pos: {x:0,y:0},
   vel: {x:0,y:0},
 }
 
@@ -40,17 +45,36 @@ function setBallPos(a) {
 
 function getAngle(p) {
   var a = Math.atan((p.y-h/2)/(p.x-w/2));
+  a += Math.PI;
   if (p.x > w/2)
     return Math.PI+a;
+  return a;
+}
+
+function getRelativeAngle(b, p) {
+  var a = getAngle(p);
+  var i = 0;
+  while (i > b) {
+    i -= Math.PI*2;
+  }
+  while (i < b) {
+    i += Math.PI*2;
+  }
+  a += i-Math.PI*2;
+  if (a < b-Math.PI)
+    a += Math.PI*2;
+  else if (a > b+Math.PI)
+    a += -Math.PI*2;
   return a;
 }
 
 timer(update, fixedUpdate);
 
 input.onTouchStart(p => {
-  touchStart = p;
-  var a = getAngle(p);
-  touchOffset = a;
+  var a = getRelativeAngle(ball.pos.x, p);
+  touchPrev = a;
+  
+  a -= ball.pos.x;
   var hx = Math.cos(a)*80;
   var hy = Math.sin(a)*80;
   // visualize handle point
@@ -59,12 +83,13 @@ input.onTouchStart(p => {
 })
 
 input.onTouchMove(p => {
-  debug = p.x;
-  t = p.x/5;
-  var a = getAngle(p);
-  //setBallPos(p.x,p.y);
-  //ball.pos.x = p.x;
-  touchX = a-touchOffset;
+  var a = getRelativeAngle(touchPrev, p);
+  
+  touchPrev = a;
+  
+  touchX = a;
+  
+  debugEl.innerHTML = a;
 })
 
 input.onTouchEnd(p => {
@@ -82,10 +107,10 @@ function update(d) {
 }
 
 function fixedUpdate(d) {
-  ball.vel.x += - 20*ball.vel.x*d;
-  //ball.vel.x += (target.x - ball.pos.x)*30*d - 20*ball.vel.x*d;
+  //ball.vel.x += - 10*ball.vel.x*d;
+  ball.vel.x += (target.x - ball.pos.x)*300*d - 20*ball.vel.x*d;
   if (touchX != null)
-    ball.vel.x += (touchX - ball.pos.x)*20*d;
+    ball.vel.x += (touchX - ball.pos.x)*350*d;
   ball.pos.x += ball.vel.x*d;
   
   if (ball.pos.x > target.x+step)
