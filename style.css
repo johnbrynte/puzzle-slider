@@ -28,6 +28,17 @@
   margin-left: -0.5px;
   background: white;
 }
+.ball_handle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  margin-top: -5px;
+  border-radius: 99px;
+  background: white;
+}
 
 .line {
   position: absolute;

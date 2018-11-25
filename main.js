@@ -11,8 +11,8 @@ var touchOffset;
 var w = window.innerWidth;
 var h = window.innerHeight;
 for (var i=0; i<w/2; i++) {
-  lineAt(w/2+i, h/2);
-  lineAt(w/2-i, h/2);
+  //lineAt(w/2+i, h/2);
+  //lineAt(w/2-i, h/2);
   i += step*2;
 }
 
@@ -25,6 +25,7 @@ function lineAt(x,y) {
 }
 
 var ballEl = document.getElementById("ball");
+var handleEl = document.getElementsByClassName("ball_handle")[0];
 
 var ball = {
   pos: {x:w/2,y:0},
@@ -38,25 +39,32 @@ function setBallPos(a) {
 }
 
 function getAngle(p) {
-  return Math.atan((p.y-w/2)/(p.x-h/2));
+  var a = Math.atan((p.y-h/2)/(p.x-w/2));
+  if (p.x > w/2)
+    return Math.PI+a;
+  return a;
 }
 
 timer(update, fixedUpdate);
 
 input.onTouchStart(p => {
-  touchX = target.x;
-  touchStart = p.x-target.x;
+  touchStart = p;
   var a = getAngle(p);
   touchOffset = a;
+  var hx = Math.cos(a)*80;
+  var hy = Math.sin(a)*80;
   // visualize handle point
+  handleEl.style.visibility = "visible";
+  handleEl.style.transform = "translate("+hx+"px,"+hy+"px)";
 })
 
 input.onTouchMove(p => {
   debug = p.x;
   t = p.x/5;
+  var a = getAngle(p);
   //setBallPos(p.x,p.y);
   //ball.pos.x = p.x;
-  touchX = p.x-touchStart;
+  touchX = a-touchOffset;
 })
 
 input.onTouchEnd(p => {
@@ -74,7 +82,8 @@ function update(d) {
 }
 
 function fixedUpdate(d) {
-  ball.vel.x += (target.x - ball.pos.x)*30*d - 20*ball.vel.x*d;
+  ball.vel.x += - 20*ball.vel.x*d;
+  //ball.vel.x += (target.x - ball.pos.x)*30*d - 20*ball.vel.x*d;
   if (touchX != null)
     ball.vel.x += (touchX - ball.pos.x)*20*d;
   ball.pos.x += ball.vel.x*d;
