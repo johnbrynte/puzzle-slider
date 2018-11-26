@@ -74,22 +74,25 @@ input.onTouchStart(p => {
   var a = getRelativeAngle(ball.pos.x, p);
   touchPrev = a;
   
-  a -= ball.pos.x;
+  touchOffset = a - ball.pos.x;
+  a = touchOffset;
   var hx = Math.cos(a)*80;
   var hy = Math.sin(a)*80;
   // visualize handle point
-  handleEl.style.visibility = "visible";
+  //handleEl.style.visibility = "visible";
   handleEl.style.transform = "translate("+hx+"px,"+hy+"px)";
 })
 
 input.onTouchMove(p => {
   var a = getRelativeAngle(touchPrev, p);
   
+  a -= touchOffset;
+  
   touchPrev = a;
   
   touchX = a;
   
-  debugEl.innerHTML = a;
+  //debugEl.innerHTML = a;
 })
 
 input.onTouchEnd(p => {
@@ -108,7 +111,7 @@ function update(d) {
 
 function fixedUpdate(d) {
   //ball.vel.x += - 10*ball.vel.x*d;
-  ball.vel.x += (target.x - ball.pos.x)*300*d - 20*ball.vel.x*d;
+  ball.vel.x += (target.x - ball.pos.x)*350*d - 40*ball.vel.x*d;
   if (touchX != null)
     ball.vel.x += (touchX - ball.pos.x)*350*d;
   ball.pos.x += ball.vel.x*d;
