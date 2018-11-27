@@ -2,6 +2,13 @@
 //////////////////////
 // INPUT
 
+document.addEventListener('touchstart', preventtouchHandler, {passive: false});
+document.addEventListener('touchmove', preventtouchHandler, {passive: false});
+
+function preventtouchHandler(evt) {
+  evt.preventDefault();
+}
+
 var callback = () => {
   var c = f => c._cbs.push(f);
   c._cbs = [];
