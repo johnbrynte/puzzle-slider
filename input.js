@@ -45,12 +45,14 @@ var el = document.getElementById("container");
 console.log(window.document.body.ontouchstart)
 
 el.addEventListener("touchstart", (evt) => {
+  evt.preventDefault();
   if (evt.touches.length > 1) return;
   input.prev = evtToPos(evt.touches[0]);
   input.onTouchStart.emit(input.prev);
 });
 
 el.addEventListener("touchmove", (evt) => {
+  evt.preventDefault();
   if (evt.touches.length < 1) return;
   input.cur = evtToPos(evt.touches[0]);
   input.onTouchMove.emit(input.cur);
